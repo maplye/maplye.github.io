@@ -64,8 +64,28 @@
     <div class="entry">
       
         <p>WSGI is a specification, laid out in PEP 333, for a standardized interface between Web servers and Python Web frameworks/applications.</p>
-<p>The simple introduct about WSGI, you can get the information as below web:</p>
-<p><a href="http://ivory.idyll.org/articles/wsgi-intro/what-is-wsgi.html" target="_blank" rel="external">http://ivory.idyll.org/articles/wsgi-intro/what-is-wsgi.html</a></p>
+<p>The simple introduction about WSGI, you can get the information as below web:</p>
+<ul>
+<li><p><a href="http://ivory.idyll.org/articles/wsgi-intro/what-is-wsgi.html" target="_blank" rel="external">An Introduction to the Python Web Server Gateway Interface (WSGI)</a></p>
+</li>
+<li><p><a href="http://lucumr.pocoo.org/2007/5/21/getting-started-with-wsgi/" target="_blank" rel="external">Getting Started with WSGI</a></p>
+</li>
+</ul>
+<h1 id="Summary_of_Specification">Summary of Specification</h1>
+<p>The PEP specifies three roles: the role of a server, the role of a framework/app, and the role of a middleware object.</p>
+<h2 id="Web_server_side">Web server side</h2>
+<p>The server must provide two things: an environ dictionary, and a start_response function. The environ dictionary needs to have the usual things present — it’s similar to the CGI environment. start_response is a callable that takes two arguments, status — containing a standard HTTP status string like 200 OK — and response_headers — a list of standard HTTP response headers.</p>
+<p>The Web server dispatches a request to the framework/app by calling the application:</p>
+<pre><code><span class="title">iterable</span> = app(environ, start_response)
+<span class="title">for</span> <span class="typedef"><span class="keyword">data</span> in iterable:</span>
+   # send <span class="typedef"><span class="keyword">data</span> to client</span>
+</code></pre><p>It’s the framework/app’s responsibility to build the headers, call start_response, and build the data returned in iterable. It’s the Web server’s responsibility to serve both the headers and the data up via HTTP.</p>
+<h2 id="Web_framework/app_side">Web framework/app side</h2>
+<p>The Web framework/app is represented to the server as a Python callable. It can be a class, an object, or a function. The arguments to <strong>init</strong>, <strong>call</strong>, or the function must be as above: an environ object and a start_response callable.</p>
+<p>The Web framework/app must call start_response before returning or yielding any data.</p>
+<p>The Web framework/app should return any data in an iterable form — e.g. return [ page ].</p>
+<h2 id="Middleware">Middleware</h2>
+<p>Middleware components must obey both the Web server side and the Web app/framework side of things, plus a few more minor niggling restrictions. Middleware should be as transparent as possible.</p>
 <h1 id="First_simple_app">First simple app</h1>
 <pre><code><span class="function"><span class="keyword">def</span> <span class="title">simple_app</span><span class="params">(environ, start_response)</span>:</span>
     status = <span class="string">'200 OK'</span>
